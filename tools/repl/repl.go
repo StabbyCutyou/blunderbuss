@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 
-	_ "github.com/lib/pq"
-
 	"github.com/StabbyCutyou/blunderbuss/boot"
 	"github.com/StabbyCutyou/blunderbuss/models"
 	"github.com/StabbyCutyou/blunderbuss/services"
@@ -12,7 +10,7 @@ import (
 )
 
 type locator struct {
-	els *services.EventLoggingService
+	els services.IEventLoggingService
 }
 
 func main() {
