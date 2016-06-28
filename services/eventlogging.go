@@ -11,13 +11,19 @@ import (
 // EventLoggingServiceConfig is
 type EventLoggingServiceConfig struct {
 	DB            *sqlx.DB
-	MetricService *MetricLoggingService
+	MetricService IMetricLoggingService
 }
 
 // EventLoggingService is
 type EventLoggingService struct {
 	db            *sqlx.DB
-	metricService *MetricLoggingService
+	metricService IMetricLoggingService
+}
+
+// IEventLoggingService is
+type IEventLoggingService interface {
+	LogEvent(e *models.Event) error
+	FindEvents(p *EventSearchParams) ([]models.Event, error)
 }
 
 // EventSearchParams is
@@ -33,7 +39,7 @@ type EventSearchParams struct {
 const insertEventQuery = "INSERT INTO events (application, type, message, context, stack_trace, created_at) VALUES ($1, $2, $3, $4, $5, $6)"
 
 // NewEventLoggingService is
-func NewEventLoggingService(cfg *EventLoggingServiceConfig) (*EventLoggingService, error) {
+func NewEventLoggingService(cfg *EventLoggingServiceConfig) (IEventLoggingService, error) {
 	return &EventLoggingService{
 		db:            cfg.DB,
 		metricService: cfg.MetricService,
@@ -123,5 +129,8 @@ func (els *EventLoggingService) FindEvents(p *EventSearchParams) ([]models.Event
 		args = append(args, p.Message)
 	}
 	err := els.db.Select(&evts, query, args...)
+	if evts == nil {
+		evts = make([]models.Event, 0)
+	}
 	return evts, err
 }

@@ -13,8 +13,8 @@ import (
 
 // Payload contains all the artifacts of a successfully booted system
 type Payload struct {
-	MetricService *services.MetricLoggingService
-	EventService  *services.EventLoggingService
+	MetricService services.IMetricLoggingService
+	EventService  services.IEventLoggingService
 	HTTPServer    *httpv1.HTTPApi
 }
 

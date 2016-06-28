@@ -26,7 +26,7 @@ type Config struct {
 	Port    int
 	Sha     string
 
-	EventService *services.EventLoggingService
+	EventService services.IEventLoggingService
 }
 
 // New initializes a new http api
@@ -70,12 +70,13 @@ func (h *HTTPApi) NewRouter() http.Handler {
 func (h *HTTPApi) Listen() error {
 	h.Server.Addr = fmt.Sprintf("0.0.0.0:%d", h.Config.Port)
 
-	log.Printf("blunderbuss listening on %s\n", h.Server.Addr)
+	log.Printf("Blunderbuss listening on %s\n", h.Server.Addr)
 	log.Fatal(h.Server.ListenAndServe())
 
 	return nil
 }
 
+// RecordEvent is
 func (h *HTTPApi) RecordEvent(w http.ResponseWriter, r *http.Request) {
 	var e models.Event
 	b, err := ioutil.ReadAll(r.Body)
@@ -85,6 +86,7 @@ func (h *HTTPApi) RecordEvent(w http.ResponseWriter, r *http.Request) {
 		w.Write(resp)
 		return
 	}
+
 	if err = r.Body.Close(); err != nil {
 		w.WriteHeader(500)
 		resp, _ := json.Marshal(map[string]string{"error": err.Error(), "b": "b"})
@@ -98,6 +100,7 @@ func (h *HTTPApi) RecordEvent(w http.ResponseWriter, r *http.Request) {
 		w.Write(resp)
 		return
 	}
+
 	if err = h.Config.EventService.LogEvent(&e); err != nil {
 		w.WriteHeader(500)
 		resp, _ := json.Marshal(map[string]string{"error": err.Error(), "d": "d"})
@@ -110,6 +113,7 @@ func (h *HTTPApi) RecordEvent(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// FindEvents is
 func (h *HTTPApi) FindEvents(w http.ResponseWriter, r *http.Request) {
 	var e services.EventSearchParams
 	b, err := ioutil.ReadAll(r.Body)
@@ -119,6 +123,7 @@ func (h *HTTPApi) FindEvents(w http.ResponseWriter, r *http.Request) {
 		w.Write(resp)
 		return
 	}
+
 	if err = r.Body.Close(); err != nil {
 		w.WriteHeader(500)
 		resp, _ := json.Marshal(map[string]string{"error": err.Error(), "b": "b"})
@@ -132,6 +137,7 @@ func (h *HTTPApi) FindEvents(w http.ResponseWriter, r *http.Request) {
 		w.Write(resp)
 		return
 	}
+
 	evts, err := h.Config.EventService.FindEvents(&e)
 	if err != nil {
 		w.WriteHeader(500)

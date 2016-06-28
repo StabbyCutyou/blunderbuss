@@ -12,9 +12,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const Version = "0.0.1"
+
 func main() {
 	// TODO incorporate extracted logging solution?
 	log.SetOutput(os.Stdout)
+	log.Printf("Blunderbuss v%s starting up...", Version)
 
 	bp, err := boot.Boot()
 	if err != nil {

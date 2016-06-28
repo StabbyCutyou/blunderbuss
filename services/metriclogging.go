@@ -12,8 +12,12 @@ type MetricLoggingService struct {
 	statsd StatsdClient
 }
 
+type IMetricLoggingService interface {
+	RecordEvent(e *models.Event) error
+}
+
 // NewMetricLoggingService is
-func NewMetricLoggingService(cfg *MetricLoggingServiceConfig) (*MetricLoggingService, error) {
+func NewMetricLoggingService(cfg *MetricLoggingServiceConfig) (IMetricLoggingService, error) {
 	return &MetricLoggingService{
 		statsd: cfg.Statsd,
 	}, nil
